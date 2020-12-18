@@ -1,0 +1,18 @@
+OperationsCenter:
+  Enabled: true
+  # Set using --set OperationsCenter.HostName=x
+  Platform: gke
+  HostName: null
+  Ingress:
+    Class: nginx
+    Annotations:
+      cert-manager.io/cluster-issuer: letsencrypt-prod
+    tls:
+      Enable: true
+      SecretName: ci-tls
+
+Persistence:
+  Size: 20Gi
+
+Hibernation:
+  Enabled: true

@@ -1,0 +1,16 @@
+images:
+  registry: "gcr.io/cb-thunder-v2"
+  imageRepository: "flow-kubectl-agent"
+  tag: "latest"
+  pullPolicy: Always
+resourceName: "k8s-agent"
+resourcePools: "kubectl"
+zoneName: "default"
+flowCredentials:
+  user: admin
+  password: changeme
+storage:
+  volumes:
+    agentWorkspace:
+      accessMode: ReadWriteMany
+      storageClass: nfs

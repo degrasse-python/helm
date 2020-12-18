@@ -1,0 +1,25 @@
+mysqlUser: flow_user
+
+persistence:
+  storageClass: ssd
+
+configurationFiles:
+  mysql.cnf: |-
+    [client]
+    default-character-set=utf8
+
+    [mysql]
+    default-character-set=utf8
+
+    [mysqld]
+    collation-server = utf8_unicode_ci
+    init-connect='SET NAMES utf8'
+    character-set-server = utf8
+
+initializationFiles:
+  create-flow-dbs.sql: |-
+    CREATE DATABASE IF NOT EXISTS flow DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci;
+    CREATE DATABASE IF NOT EXISTS flow_upgrade DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci;
+    GRANT ALL PRIVILEGES ON flow.* TO 'flow_user'@'%';
+    GRANT ALL PRIVILEGES ON flow_upgrade.* TO 'flow_user'@'%';
+    FLUSH PRIVILEGES;

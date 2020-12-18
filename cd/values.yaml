@@ -1,0 +1,128 @@
+ingress:
+  enabled: true
+  host:
+
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    kubernetes.io/ingress.class: "nginx"
+    nginx.ingress.kubernetes.io/affinity: "cookie"
+    nginx.ingress.kubernetes.io/session-cookie-name: "route"
+    nginx.ingress.kubernetes.io/session-cookie-hash: "sha1"
+    nginx.ingress.kubernetes.io/proxy-body-size: "10G"
+    nginx.ingress.kubernetes.io/secure-backends: "false"
+
+  certificate:
+    existingSecret: cd-tls
+
+server:
+  replicas: 1
+
+  ecconfigure: "--serverInitMemoryMB=4096 --serverMaxMemoryMB=4096"
+
+  resources:
+    limits:
+      cpu: 4
+      memory: 8Gi
+    requests:
+      cpu: 1.5
+      memory: 8Gi
+
+  nodeSelector: { }
+  tolerations: [ ]
+  affinity: { }
+
+#---------------------------------------------
+# Flow bound agent configuration section
+#---------------------------------------------
+
+# This is an internal component that serves the web server and the repository
+# connections to Flow server. It will be automatically enabled or disabled if
+# deployment of these components is enabled.
+
+boundAgent:
+
+  replicas: 1
+  ecconfigure: "--agentInitMemoryMB=1024 --agentMaxMemoryMB=1536"
+  resources:
+    limits:
+      cpu: 1
+      memory: 2Gi
+    requests:
+      cpu: 0.25
+      memory: 1Gi
+
+#---------------------------------------------
+# Flow storage configuration section
+#---------------------------------------------
+
+storage:
+
+  volumes:
+
+    serverPlugins:
+      name: flow-server-shared
+      accessMode: ReadWriteMany
+      storageClass: nfs
+      storage: 5Gi
+
+    repositoryStorage:
+      name: flow-repo-artifacts
+      accessMode: ReadWriteOnce
+      storage: 20Gi
+      storageClass: ssd
+
+    doisStorage:
+      name: elasticsearch-data
+      accessMode: ReadWriteOnce
+      storage: 10Gi
+      storageClass: ssd
+
+database:
+  clusterEndpoint: mysql
+  dbPassword: changeme
+  dbUser: flow_user
+  dbName: flow
+  dbPort: 3306
+  dbType: mysql
+
+#---------------------------------------------
+# Flow server credentials configuration section
+#---------------------------------------------
+
+flowCredentials:
+  adminPassword: changeme
+
+#---------------------------------------------
+# Flow server license configuration optional section
+#---------------------------------------------
+
+# Optional section to allow for setting up license with flow server during
+# init phase. Allows for either create a secret from this chart or supply
+# own pre-created one pre-created secret must have a single field named
+# CBF_LICENSE with value containing license file contents.
+
+
+#---------------------------------------------
+# Flow ingress configuration section
+#---------------------------------------------
+
+# As Flow requires server repository and DevOps Insight to be exposed as
+# externally available services ingress needs to ports 8200 8443 61613 9200
+# and 9500 to be open to outer world. This is not supported as per kubernetes
+# ingress specification, though available as a non-standard extension of
+# nginx-ingress, which is why we are bundling ingress itself with Flow.
+
+nginx-ingress:
+
+  enabled: false
+
+  tcp:
+    8200: "{{ .Release.Namespace }}/flow-repository:8200"
+    8443: "{{ .Release.Namespace }}/flow-server:8443"
+    61613: "{{ .Release.Namespace }}/flow-server:61613"
+    9200: "{{ .Release.Namespace }}/flow-devopsinsight:9200"
+    9500: "{{ .Release.Namespace }}/flow-devopsinsight:9500"
+
+
+demoMode: false
+

@@ -1,1 +1,69 @@
 #!/bin/bash
+
+# Connect to cluster
+gcloud container clusters get-credentials "$CLUSTER_NAME" --zone us-central1-a --project $CLUSTER_PROJECT
+
+# Add Helm repos
+helm repo add cloudbees https://charts.cloudbees.com/public/cloudbees
+helm repo add bitnami https://charts.bitnami.com/bitnami
+helm repo add kvaps https://kvaps.github.io/charts
+helm repo add sandbox-charts https://cb-sandbox.github.io/charts/
+helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
+helm repo add jetstack https://charts.jetstack.io
+
+
+# Update repos
+helm repo update
+
+
+# Installing Nginx ingress controller
+if [ "$CD_ENABLED" = true ]; then
+  helm upgrade --install ingress-nginx ingress-nginx/ingress-nginx \
+    -n ingress-nginx --create-namespace \
+    -f nginx/values.yaml
+else
+  helm upgrade --install ingress-nginx ingress-nginx/ingress-nginx \
+    -n ingress-nginx --create-namespace
+fi
+
+# Setup DNS
+. ./scripts/dns.sh
+
+
+# Install cert-manager
+helm upgrade --install cert-manager jetstack/cert-manager \
+  --set installCRDs=true -n cert-manager --create-namespace
+sleep 45
+sed "s/REPLACE_EMAIL/$EMAIL/g" cert-manager/issuers.yaml | kubectl apply -f -
+
+
+if [ "$CI_ENABLED" = true ]; then
+  helm upgrade --install cloudbees-ci cloudbees/cloudbees-core -n cloudbees-ci \
+    --create-namespace -f ci/values.yaml --version "$CI_VERSION" \
+    --set OperationsCenter.HostName="ci.$BASE_DOMAIN"
+fi
+
+if [ "$CD_ENABLED" = true ]; then
+  # Install SSD storage class
+  kubectl apply -f ./k8s/ssd.yaml
+  # Install nfs-server-provisioner
+  helm upgrade --install nfs-server-provisioner kvaps/nfs-server-provisioner --version 1.1.1 \
+    -n cloudbees-cd --create-namespace -f nfs-server-provisioner/values.yaml
+  # Install mysql
+  helm upgrade --install mysql sandbox-charts/mysql \
+    -n cloudbees-cd --create-namespace -f mysql/values.yaml \
+    --set mysqlPassword=$MYSQL_PASSWORD \
+    --set mysqlRootPassword=$MYSQL_PASSWORD
+  # Install CD
+  helm upgrade --install cloudbees-cd cloudbees/cloudbees-flow -n cloudbees-cd \
+    --create-namespace -f cd/values.yaml --version "$CD_VERSION" \
+    --set ingress.host="cd.$BASE_DOMAIN" \
+    --set flowCredentials.adminPassword=$CD_ADMIN_PASS \
+    --set database.dbPassword=$MYSQL_PASSWORD \
+    --set flowLicense.licenseData="$CD_LICENSE" \
+    --timeout 10000s
+  # Install CD agent
+  helm upgrade --install agent cloudbees/cloudbees-flow-agent \
+    -f cd/agent/values.yaml -n cloudbees-cd \
+    --set flowCredentials.password=$CD_ADMIN_PASS
+fi

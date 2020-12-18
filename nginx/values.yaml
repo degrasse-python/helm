@@ -1,0 +1,6 @@
+tcp:
+  8200: "cloudbees-cd/flow-repository:8200"
+  8443: "cloudbees-cd/flow-server:8443"
+  61613: "cloudbees-cd/flow-server:61613"
+  9200: "cloudbees-cd/flow-devopsinsight:9200"
+  9500: "cloudbees-cd/flow-devopsinsight:9500"
