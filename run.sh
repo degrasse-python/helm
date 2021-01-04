@@ -44,6 +44,7 @@ if [ "$CI_ENABLED" = true ]; then
 fi
 
 if [ "$CD_ENABLED" = true ]; then
+  export CD_LICENSE=$(cat $CD_LICENSE)
   # Install SSD storage class
   kubectl apply -f ./k8s/ssd.yaml
   # Install nfs-server-provisioner
