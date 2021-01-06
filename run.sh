@@ -5,11 +5,12 @@ gcloud container clusters get-credentials "$CLUSTER_NAME" --zone us-central1-a -
 
 # Add Helm repos
 helm repo add cloudbees https://charts.cloudbees.com/public/cloudbees
-helm repo add bitnami https://charts.bitnami.com/bitnami
 helm repo add kvaps https://kvaps.github.io/charts
 helm repo add sandbox-charts https://cb-sandbox.github.io/charts/
 helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
 helm repo add jetstack https://charts.jetstack.io
+helm repo add jfrog https://charts.jfrog.io
+helm repo add oteemo-charts https://oteemo.github.io/charts
 
 
 # Update repos
