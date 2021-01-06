@@ -1,0 +1,40 @@
+replicaCount: 1
+
+ingress:
+  enabled: true
+  hosts:
+    - name: sonar.example.com
+      path: /
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/proxy-body-size: "16m"
+
+  tls:
+    - secretName: sonar-tls
+      hosts:
+        - sonar.example.com
+
+# List of plugins to install.
+# For example:
+# plugins:
+#  install:
+#    - "https://github.com/AmadeusITGroup/sonar-stash/releases/download/1.3.0/sonar-stash-plugin-1.3.0.jar"
+#    - "https://github.com/SonarSource/sonar-ldap/releases/download/2.2-RC3/sonar-ldap-plugin-2.2.0.601.jar"
+plugins:
+  install: []
+  lib: []
+
+
+persistence:
+  enabled: true
+
+  storageClass: ssd
+  accessMode: ReadWriteOnce
+  size: 5Gi
+
+
+account:
+  adminPassword: admin
+  currentAdminPassword: admin
+

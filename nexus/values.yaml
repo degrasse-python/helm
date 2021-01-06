@@ -1,0 +1,10 @@
+replicaCount: 1
+
+ingress:
+  enabled: true
+  path: /
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+  tls:
+    enabled: true
+    secretName: nexus-tls

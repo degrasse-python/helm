@@ -37,6 +37,31 @@ sleep 45
 sed "s/REPLACE_EMAIL/$EMAIL/g" cert-manager/issuers.yaml | kubectl apply -f -
 
 
+if [ "$SONARQUBE_ENABLED" = true ]; then
+  helm upgrade --install sonarqube oteemo-charts/sonarqube -n sonarqube \
+  --create-namespace -f sonarqube/values.yaml --version "$SONARQUBE_VERSION" \
+  --set ingress.hosts[0].name="sonar.$BASE_DOMAIN" \
+  --set ingress.tls[0].hosts[0]="sonar.$BASE_DOMAIN" \
+  --set account.adminPassword="$SONARQUBE_TOKEN"
+fi
+
+if [ "$NEXUS_ENABLED" = true ]; then
+  helm upgrade --install nexus oteemo-charts/sonatype-nexus -n nexus \
+  --create-namespace -f nexus/values.yaml --version "$NEXUS_VERSION" \
+  --set nexusProxy.env.nexusHttpHost="nexus.$BASE_DOMAIN" \
+  --set nexusProxy.env.nexusDockerHost="docker.$BASE_DOMAIN" \
+  --set initAdminPassword.password="$NEXUS_TOKEN"
+fi
+
+if [ "$ARTIFACTORY_ENABLED" = true ]; then
+  helm upgrade --install artifactory jfrog/artifactory-oss -n artifactory \
+  --create-namespace -f artifactory/values.yaml --version "$ARTIFACTORY_VERSION" \
+  --set artifactory.ingress.hosts[0]="artifactory.$BASE_DOMAIN" \
+  --set artifactory.ingress.tls[0].hosts[0]="artifactory.$BASE_DOMAIN" \
+  --set account.adminPassword="$ARTIFACTORY_TOKEN"
+fi
+
+
 if [ "$CI_ENABLED" = true ]; then
   helm upgrade --install cloudbees-ci cloudbees/cloudbees-core -n cloudbees-ci \
     --create-namespace -f ci/values.yaml --version "$CI_VERSION" \
