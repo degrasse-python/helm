@@ -4,7 +4,7 @@
 gcloud container clusters get-credentials "$CLUSTER_NAME" --zone us-central1-a --project $CLUSTER_PROJECT
 
 # Add Helm repos
-helm repo add stable https://kubernetes-charts.storage.googleapis.com/
+helm repo add stable https://charts.helm.sh/stable
 helm repo add cloudbees https://charts.cloudbees.com/public/cloudbees
 helm repo add kvaps https://kvaps.github.io/charts
 helm repo add sandbox-charts https://cb-sandbox.github.io/charts/
