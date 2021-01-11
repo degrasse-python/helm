@@ -4,6 +4,7 @@
 gcloud container clusters get-credentials "$CLUSTER_NAME" --zone us-central1-a --project $CLUSTER_PROJECT
 
 # Add Helm repos
+helm repo add stable https://kubernetes-charts.storage.googleapis.com/
 helm repo add cloudbees https://charts.cloudbees.com/public/cloudbees
 helm repo add kvaps https://kvaps.github.io/charts
 helm repo add sandbox-charts https://cb-sandbox.github.io/charts/
@@ -19,12 +20,12 @@ helm repo update
 
 # Installing Nginx ingress controller
 if [ "$CD_ENABLED" = true ]; then
-  helm upgrade --install ingress-nginx ingress-nginx/ingress-nginx \
-    -n ingress-nginx --create-namespace \
+  helm upgrade --install ingress-nginx stable/nginx-ingress \
+    -n ingress-nginx --create-namespace --version 1.25.0 \
     -f nginx/values.yaml
 else
-  helm upgrade --install ingress-nginx ingress-nginx/ingress-nginx \
-    -n ingress-nginx --create-namespace
+  helm upgrade --install ingress-nginx stable/nginx-ingress \
+    -n ingress-nginx --create-namespace --version 1.25.0
 fi
 
 # Setup DNS
