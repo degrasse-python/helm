@@ -17,7 +17,7 @@ ingress:
 server:
   replicas: 1
 
-  ecconfigure: "-Dcommander.sda=false --serverInitMemoryMB=4096 --serverMaxMemoryMB=4096"
+  ecconfigure: "--serverInitMemoryMB=4096 --serverMaxMemoryMB=4096"
 
   resources:
     limits:
