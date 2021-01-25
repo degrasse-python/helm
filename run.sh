@@ -85,7 +85,7 @@ if [ "$CD_ENABLED" = true ]; then
   # Install CD
   helm upgrade --install cloudbees-cd cloudbees/cloudbees-flow -n cloudbees-cd \
     --create-namespace -f cd/values.yaml --version "$CD_VERSION" \
-    --set ingress.host="cd.$BASE_DOMAIN" ${CD_IMAGE_TAG:+"--set images.tag=2020.12.0.144909_2.1.6_20201222"} \
+    --set ingress.host="cd.$BASE_DOMAIN" `if [ "$CD_IMAGE_TAG" ]; then echo "--set images.tag=$CD_IMAGE_TAG"; fi` \
     --set flowCredentials.adminPassword=$CD_ADMIN_PASS \
     --set database.dbPassword=$MYSQL_PASSWORD \
     --set flowLicense.licenseData="$CD_LICENSE" \
