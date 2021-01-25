@@ -30,9 +30,6 @@ server:
   nodeSelector: { }
   tolerations: [ ]
   affinity: { }
-  extraEnvs:
-    - name: CBF_SERVER_SDA_MODE
-      value: "false"
 
 #---------------------------------------------
 # Flow bound agent configuration section
