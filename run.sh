@@ -74,8 +74,6 @@ if [ "$CD_ENABLED" = true ]; then
   export CD_LICENSE=$(cat $CD_LICENSE)
   # Install SSD storage class
   kubectl apply -f ./k8s/ssd.yaml
-  kubectl apply -f ./k8s/cdAgentRole.yaml
-  kubectl apply -f ./k8s/cdAgentRoleBinding.yaml
   # Install nfs-server-provisioner
   helm upgrade --install nfs-server-provisioner kvaps/nfs-server-provisioner --version 1.1.1 \
     -n cloudbees-cd --create-namespace -f nfs-server-provisioner/values.yaml
@@ -85,6 +83,8 @@ if [ "$CD_ENABLED" = true ]; then
     --set mysqlPassword=$MYSQL_PASSWORD \
     --set mysqlRootPassword=$MYSQL_PASSWORD
   # Install CD
+  kubectl apply -f ./k8s/cdAgentRole.yaml
+  kubectl apply -f ./k8s/cdAgentRoleBinding.yaml
   helm upgrade --install cloudbees-cd cloudbees/cloudbees-flow -n cloudbees-cd \
     --create-namespace -f cd/values.yaml --version "$CD_VERSION" \
     --set ingress.host="cd.$BASE_DOMAIN" `if [ "$CD_IMAGE_TAG" ]; then echo "--set images.tag=$CD_IMAGE_TAG"; fi` \
