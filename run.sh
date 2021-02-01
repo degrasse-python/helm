@@ -74,6 +74,8 @@ if [ "$CD_ENABLED" = true ]; then
   export CD_LICENSE=$(cat $CD_LICENSE)
   # Install SSD storage class
   kubectl apply -f ./k8s/ssd.yaml
+  kubectl apply -f ./k8s/cdAgentRole.yaml
+  kubectl apply -f ./k8s/cdAgentRoleBinding.yaml
   # Install nfs-server-provisioner
   helm upgrade --install nfs-server-provisioner kvaps/nfs-server-provisioner --version 1.1.1 \
     -n cloudbees-cd --create-namespace -f nfs-server-provisioner/values.yaml
