@@ -1,7 +1,7 @@
 images:
   registry: "gcr.io/cb-thunder-v2"
-  imageRepository: "flow-kubectl-agent"
-  tag: "latest"
+  imageRepository: "k8s-agent"
+  tag: "v4"
   pullPolicy: Always
 resourceName: "k8s-agent"
 resourcePools: "kubectl"

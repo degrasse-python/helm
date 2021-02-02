@@ -24,5 +24,6 @@ RUN bash install.sh --disable-prompts
 
 # install kubectl
 RUN /home/cbflow/google-cloud-sdk/bin/gcloud components install kubectl
-
-ENV PATH="${PATH}:/home/cbflow/google-cloud-sdk/bin"
+USER root
+RUN mv /home/cbflow/google-cloud-sdk/bin/* /usr/local/bin/
+USER cbflow
