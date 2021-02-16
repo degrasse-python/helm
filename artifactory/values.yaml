@@ -9,4 +9,7 @@ artifactory:
     tls:
       - secretName: artifactory-tls
         hosts: []
+  admin:
+    ip: "*"
+    username: admin
 

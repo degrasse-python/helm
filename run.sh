@@ -52,6 +52,7 @@ if [ "$NEXUS_ENABLED" = true ]; then
   --create-namespace -f nexus/values.yaml --version "$NEXUS_VERSION" \
   --set nexusProxy.env.nexusHttpHost="nexus.$BASE_DOMAIN" \
   --set nexusProxy.env.nexusDockerHost="docker.$BASE_DOMAIN" \
+  --set initAdminPassword.enabled=true \
   --set initAdminPassword.password="$NEXUS_TOKEN"
 fi
 
@@ -60,7 +61,7 @@ if [ "$ARTIFACTORY_ENABLED" = true ]; then
   --create-namespace -f artifactory/values.yaml --version "$ARTIFACTORY_VERSION" \
   --set artifactory.ingress.hosts[0]="artifactory.$BASE_DOMAIN" \
   --set artifactory.ingress.tls[0].hosts[0]="artifactory.$BASE_DOMAIN" \
-  --set account.adminPassword="$ARTIFACTORY_TOKEN"
+  --set artifactory.admin.password="$ARTIFACTORY_TOKEN"
 fi
 
 
