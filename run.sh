@@ -68,7 +68,8 @@ fi
 if [ "$CI_ENABLED" = true ]; then
   helm upgrade --install cloudbees-ci cloudbees/cloudbees-core -n cloudbees-ci \
     --create-namespace -f ci/values.yaml --version "$CI_VERSION" \
-    --set OperationsCenter.HostName="ci.$BASE_DOMAIN"
+    --set OperationsCenter.HostName="ci.$BASE_DOMAIN" \
+    --set-file 'OperationsCenter.ExtraGroovyConfiguration.02-rbac\.groovy'=./ci/02-rbac.groovy
 fi
 
 if [ "$CD_ENABLED" = true ]; then
