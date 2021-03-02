@@ -1,4 +1,4 @@
-FROM docker.io/cloudbees/cbflow-agent:10.0.2.144701_2.1.4_20201130
+FROM docker.io/cloudbees/cbflow-agent:10.1.0.145850_2.1.12_20210224
 
 USER root
 # install curl, git, vim, python3 via apt-get

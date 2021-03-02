@@ -1,7 +1,7 @@
 images:
   registry: "gcr.io/cb-thunder-v2"
   imageRepository: "k8s-agent"
-  tag: "v4"
+  tag: "10.1.0.145850_2.1.12_20210224"
   pullPolicy: Always
 resourceName: "k8s-agent"
 resourcePools: "kubectl"
