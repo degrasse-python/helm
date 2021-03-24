@@ -13,10 +13,8 @@ helm repo add jetstack https://charts.jetstack.io
 helm repo add jfrog https://charts.jfrog.io
 helm repo add oteemo-charts https://oteemo.github.io/charts
 
-
 # Update repos
 helm repo update
-
 
 # Installing Nginx ingress controller
 if [ "$CD_ENABLED" = true ]; then
@@ -31,44 +29,49 @@ fi
 # Setup DNS
 . ./scripts/dns.sh
 
-
 # Install cert-manager
 helm upgrade --install cert-manager jetstack/cert-manager \
   --set installCRDs=true -n cert-manager --create-namespace
 sleep 45
 sed "s/REPLACE_EMAIL/$EMAIL/g" cert-manager/issuers.yaml | kubectl apply -f -
 
-
 if [ "$SONARQUBE_ENABLED" = true ]; then
   helm upgrade --install sonarqube oteemo-charts/sonarqube -n sonarqube \
-  --create-namespace -f sonarqube/values.yaml --version "$SONARQUBE_VERSION" \
-  --set ingress.hosts[0].name="sonar.$BASE_DOMAIN" \
-  --set ingress.tls[0].hosts[0]="sonar.$BASE_DOMAIN" \
-  --set account.adminPassword="$SONARQUBE_TOKEN"
+    --create-namespace -f sonarqube/values.yaml --version "$SONARQUBE_VERSION" \
+    --set ingress.hosts[0].name="sonar.$BASE_DOMAIN" \
+    --set ingress.tls[0].hosts[0]="sonar.$BASE_DOMAIN" \
+    --set account.adminPassword="$SONARQUBE_TOKEN"
 fi
 
 if [ "$NEXUS_ENABLED" = true ]; then
   helm upgrade --install nexus oteemo-charts/sonatype-nexus -n nexus \
-  --create-namespace -f nexus/values.yaml --version "$NEXUS_VERSION" \
-  --set nexusProxy.env.nexusHttpHost="nexus.$BASE_DOMAIN" \
-  --set nexusProxy.env.nexusDockerHost="docker.$BASE_DOMAIN" \
-  --set initAdminPassword.enabled=true \
-  --set initAdminPassword.password="$NEXUS_TOKEN"
+    --create-namespace -f nexus/values.yaml --version "$NEXUS_VERSION" \
+    --set nexusProxy.env.nexusHttpHost="nexus.$BASE_DOMAIN" \
+    --set nexusProxy.env.nexusDockerHost="docker.$BASE_DOMAIN" \
+    --set initAdminPassword.enabled=true \
+    --set initAdminPassword.password="$NEXUS_TOKEN"
 fi
 
 if [ "$ARTIFACTORY_ENABLED" = true ]; then
   helm upgrade --install artifactory jfrog/artifactory-oss -n artifactory \
-  --create-namespace -f artifactory/values.yaml --version "$ARTIFACTORY_VERSION" \
-  --set artifactory.ingress.hosts[0]="artifactory.$BASE_DOMAIN" \
-  --set artifactory.ingress.tls[0].hosts[0]="artifactory.$BASE_DOMAIN" \
-  --set artifactory.admin.password="$ARTIFACTORY_TOKEN"
+    --create-namespace -f artifactory/values.yaml --version "$ARTIFACTORY_VERSION" \
+    --set artifactory.ingress.hosts[0]="artifactory.$BASE_DOMAIN" \
+    --set artifactory.ingress.tls[0].hosts[0]="artifactory.$BASE_DOMAIN" \
+    --set artifactory.admin.password="$ARTIFACTORY_TOKEN"
 fi
 
-
 if [ "$CI_ENABLED" = true ]; then
-  helm upgrade --install cloudbees-ci cloudbees/cloudbees-core -n cloudbees-ci \
+  if [ "$CD_ENABLED" = true ]; then
+    CI_DOMAIN="sda.$BASE_DOMAIN"
+    CI_NAMESPACE="cloudbees-sda"
+  else
+    CI_DOMAIN="ci.$BASE_DOMAIN"
+    CI_NAMESPACE="cloudbees-ci"
+  fi
+  helm upgrade --install cloudbees-ci cloudbees/cloudbees-core -n "$CI_NAMESPACE" \
     --create-namespace -f ci/values.yaml --version "$CI_VERSION" \
-    --set OperationsCenter.HostName="ci.$BASE_DOMAIN" \
+    --set OperationsCenter.HostName="$CI_DOMAIN" \
+    $(if [ "$CD_ENABLED" = true ]; then echo "--set sda=true"; fi) \
     --set-file 'OperationsCenter.ExtraGroovyConfiguration.02-rbac\.groovy'=./ci/02-rbac.groovy
 fi
 
@@ -87,9 +90,16 @@ if [ "$CD_ENABLED" = true ]; then
   # Install CD
   kubectl apply -f ./k8s/cdAgentRole.yaml
   kubectl apply -f ./k8s/cdAgentRoleBinding.yaml
-  helm upgrade --install cloudbees-cd cloudbees/cloudbees-flow -n cloudbees-cd \
+  if [ "$CI_ENABLED" = true ]; then
+    CD_DOMAIN="sda.$BASE_DOMAIN"
+    CD_NAMESPACE="cloudbees-sda"
+  else
+    CD_DOMAIN="cd.$BASE_DOMAIN"
+    CD_NAMESPACE="cloudbees-cd"
+  fi
+  helm upgrade --install cloudbees-cd cloudbees/cloudbees-flow -n "$CD_NAMESPACE" \
     --create-namespace -f cd/values.yaml --version "$CD_VERSION" \
-    --set ingress.host="cd.$BASE_DOMAIN" `if [ "$CD_IMAGE_TAG" ]; then echo "--set images.tag=$CD_IMAGE_TAG"; fi` \
+    --set ingress.host="$CD_DOMAIN" $(if [ "$CD_IMAGE_TAG" ]; then echo "--set images.tag=$CD_IMAGE_TAG"; fi) \
     --set flowCredentials.adminPassword=$CD_ADMIN_PASS \
     --set database.dbPassword=$MYSQL_PASSWORD \
     --set flowLicense.licenseData="$CD_LICENSE" \
