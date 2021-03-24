@@ -61,13 +61,8 @@ if [ "$ARTIFACTORY_ENABLED" = true ]; then
 fi
 
 if [ "$CI_ENABLED" = true ]; then
-  if [ "$CD_ENABLED" = true ]; then
-    CI_DOMAIN="sda.$BASE_DOMAIN"
-    CI_NAMESPACE="cloudbees-sda"
-  else
-    CI_DOMAIN="ci.$BASE_DOMAIN"
-    CI_NAMESPACE="cloudbees-ci"
-  fi
+  CI_DOMAIN="sda.$BASE_DOMAIN"
+  CI_NAMESPACE="cloudbees-sda"
   helm upgrade --install cloudbees-ci cloudbees/cloudbees-core -n "$CI_NAMESPACE" \
     --create-namespace -f ci/values.yaml --version "$CI_VERSION" \
     --set OperationsCenter.HostName="$CI_DOMAIN" \
@@ -76,13 +71,8 @@ if [ "$CI_ENABLED" = true ]; then
 fi
 
 if [ "$CD_ENABLED" = true ]; then
-  if [ "$CI_ENABLED" = true ]; then
-    CD_DOMAIN="sda.$BASE_DOMAIN"
-    CD_NAMESPACE="cloudbees-sda"
-  else
-    CD_DOMAIN="cd.$BASE_DOMAIN"
-    CD_NAMESPACE="cloudbees-cd"
-  fi
+  CD_DOMAIN="sda.$BASE_DOMAIN"
+  CD_NAMESPACE="cloudbees-sda"
   export CD_LICENSE=$(cat $CD_LICENSE)
   # Install SSD storage class
   kubectl apply -f ./k8s/ssd.yaml
