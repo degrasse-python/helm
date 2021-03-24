@@ -9,4 +9,4 @@ roleRef:
 subjects:
   - kind: ServiceAccount
     name: default
-    namespace: cloudbees-cd
+    namespace: cloudbees-sda

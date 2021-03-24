@@ -1,5 +1,10 @@
 replicaCount: 1
-
+nexus:
+  service:
+    type: ClusterIP
+  nexusPort: 8081
+  additionalPorts:
+  - 8081
 ingress:
   enabled: true
   path: /
