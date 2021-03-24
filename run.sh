@@ -76,20 +76,6 @@ if [ "$CI_ENABLED" = true ]; then
 fi
 
 if [ "$CD_ENABLED" = true ]; then
-  export CD_LICENSE=$(cat $CD_LICENSE)
-  # Install SSD storage class
-  kubectl apply -f ./k8s/ssd.yaml
-  # Install nfs-server-provisioner
-  helm upgrade --install nfs-server-provisioner kvaps/nfs-server-provisioner --version 1.1.1 \
-    -n cloudbees-cd --create-namespace -f nfs-server-provisioner/values.yaml
-  # Install mysql
-  helm upgrade --install mysql sandbox-charts/mysql \
-    -n cloudbees-cd --create-namespace -f mysql/values.yaml \
-    --set mysqlPassword=$MYSQL_PASSWORD \
-    --set mysqlRootPassword=$MYSQL_PASSWORD
-  # Install CD
-  kubectl apply -f ./k8s/cdAgentRole.yaml
-  kubectl apply -f ./k8s/cdAgentRoleBinding.yaml
   if [ "$CI_ENABLED" = true ]; then
     CD_DOMAIN="sda.$BASE_DOMAIN"
     CD_NAMESPACE="cloudbees-sda"
@@ -97,6 +83,21 @@ if [ "$CD_ENABLED" = true ]; then
     CD_DOMAIN="cd.$BASE_DOMAIN"
     CD_NAMESPACE="cloudbees-cd"
   fi
+  export CD_LICENSE=$(cat $CD_LICENSE)
+  # Install SSD storage class
+  kubectl apply -f ./k8s/ssd.yaml
+  # Install nfs-server-provisioner
+  helm upgrade --install nfs-server-provisioner kvaps/nfs-server-provisioner --version 1.1.1 \
+    -n "$CD_NAMESPACE" --create-namespace -f nfs-server-provisioner/values.yaml
+  # Install mysql
+  helm upgrade --install mysql sandbox-charts/mysql \
+    -n "$CD_NAMESPACE" --create-namespace -f mysql/values.yaml \
+    --set mysqlPassword=$MYSQL_PASSWORD \
+    --set mysqlRootPassword=$MYSQL_PASSWORD
+  # Install CD
+  kubectl apply -f ./k8s/cdAgentRole.yaml
+  kubectl apply -f ./k8s/cdAgentRoleBinding.yaml
+
   helm upgrade --install cloudbees-cd cloudbees/cloudbees-flow -n "$CD_NAMESPACE" \
     --create-namespace -f cd/values.yaml --version "$CD_VERSION" \
     --set ingress.host="$CD_DOMAIN" $(if [ "$CD_IMAGE_TAG" ]; then echo "--set images.tag=$CD_IMAGE_TAG"; fi) \
