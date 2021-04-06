@@ -100,5 +100,6 @@ if [ "$CD_ENABLED" = true ]; then
   # Install CD agent
   helm upgrade --install agent cloudbees/cloudbees-flow-agent \
     -f cd/agent/values.yaml -n "$CD_NAMESPACE" \
-    --set flowCredentials.password=$CD_ADMIN_PASS
+    --set flowCredentials.password=$CD_ADMIN_PASS \
+    --wait
 fi
