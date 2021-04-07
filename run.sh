@@ -68,6 +68,7 @@ if [ "$CI_ENABLED" = true ]; then
     --set OperationsCenter.HostName="$CI_DOMAIN" \
     $(if [ "$CD_ENABLED" = true ]; then echo "--set sda=true"; fi) \
     --set-file 'OperationsCenter.ExtraGroovyConfiguration.02-rbac\.groovy'=./ci/02-rbac.groovy
+  . ./scripts/workload_identity.sh
 fi
 
 if [ "$CD_ENABLED" = true ]; then
