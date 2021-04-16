@@ -93,7 +93,6 @@ if [ "$CD_ENABLED" = true ]; then
     --create-namespace -f cd/values.yaml --version "$CD_VERSION" \
     --set ingress.host="$CD_DOMAIN" $(if [ "$CD_IMAGE_TAG" ]; then echo "--set images.tag=$CD_IMAGE_TAG"; fi) \
     --set flowCredentials.adminPassword=$CD_ADMIN_PASS \
-    $(if [ "$CI_ENABLED" = true ]; then echo "--set sda=true"; fi) \
     --set database.dbPassword=$MYSQL_PASSWORD \
     --set flowLicense.licenseData="$CD_LICENSE" \
     --set serverName="$CD_DOMAIN" \
