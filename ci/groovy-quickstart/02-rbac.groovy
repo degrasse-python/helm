@@ -2,6 +2,7 @@ import com.cloudbees.hudson.plugins.folder.*
 import hudson.security.HudsonPrivateSecurityRealm
 import jenkins.model.Jenkins
 import nectar.plugins.rbac.groups.*
+import io.fabric8.kubernetes.client.DefaultKubernetesClient
 
 import java.util.logging.Logger
 
@@ -31,5 +32,8 @@ logger.info("Migrating from version $markerVersion to version $version")
 Jenkins jenkins = Jenkins.getInstance()
 
 HudsonPrivateSecurityRealm hudsonPrivateSecurityRealm = new HudsonPrivateSecurityRealm(false, false, null)
-hudsonPrivateSecurityRealm.createAccount("admin", "changeit")
+def client = new DefaultKubernetesClient()
+def encodedPw = client.secrets().inNamespace("cloudbees-sda").withName("ci-pass").get().data.password
+def decodedPw = new String(encodedPw.decodeBase64())
+hudsonPrivateSecurityRealm.createAccount("admin", decodedPw)
 jenkins.setSecurityRealm(hudsonPrivateSecurityRealm)

@@ -2,3 +2,5 @@ license.xml
 .idea/
 .vscode/
 transaction.yaml
+ci.sh
+ci-cleanup.sh

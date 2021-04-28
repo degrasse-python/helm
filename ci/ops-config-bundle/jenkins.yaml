@@ -1,0 +1,35 @@
+jenkins:
+  markupFormatter:
+    rawHtml:
+      disableSyntaxHighlighting: false
+  numExecutors: 0
+  quietPeriod: 0
+  systemMessage: "Jenkins configured using CloudBees CI CasC v1"
+notificationConfiguration:
+  enabled: true
+  router: "operationsCenter"
+unclassified:
+  experimentalPlugins:
+    enabled: true
+  gitHubConfiguration:
+    apiRateLimitChecker: ThrottleForNormalize
+  globallibraries:
+    libraries:
+    - defaultVersion: "master"
+      name: "pipeline-library"
+      retriever:
+        modernSCM:
+          scm:
+            github:
+              repoOwner: "cloudbees-days"
+              repository: "pipeline-library"
+  hibernationConfiguration:
+    activities:
+    - "build"
+    - "web"
+    enabled: true
+    gracePeriod: 4020
+  pollSCM:
+    pollingThreadCount: 10
+  usageStatisticsCloudBees:
+    usageStatisticsCollected: false

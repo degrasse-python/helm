@@ -1,0 +1,12 @@
+spec:
+  template:
+    spec:
+      containers:
+        name: flow-agent
+        volumeMounts:
+          - mountPath: /plugins-data
+            name: plugins-volume
+      volumes:
+        - name: plugins-volume
+          persistentVolumeClaim:
+            claimName: flow-server-shared

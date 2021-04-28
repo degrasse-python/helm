@@ -12,6 +12,8 @@ helm repo add sandbox-charts https://cb-sandbox.github.io/charts/
 helm repo add jetstack https://charts.jetstack.io
 helm repo add jfrog https://charts.jfrog.io
 helm repo add oteemo-charts https://oteemo.github.io/charts
+helm repo add secrets-store-csi-driver https://raw.githubusercontent.com/kubernetes-sigs/secrets-store-csi-driver/master/charts
+
 
 # Update repos
 helm repo update
@@ -63,13 +65,24 @@ fi
 if [ "$CI_ENABLED" = true ]; then
   CI_DOMAIN="sda.$BASE_DOMAIN"
   CI_NAMESPACE="cloudbees-sda"
+  helm upgrade --install csi-secrets-store secrets-store-csi-driver/secrets-store-csi-driver -n kube-system
+  kubectl apply -f https://raw.githubusercontent.com/GoogleCloudPlatform/secrets-store-csi-driver-provider-gcp/main/deploy/provider-gcp-plugin.yaml
+
+  kubectl create ns $CI_NAMESPACE
+  kubectl create secret generic ci-pass --from-literal=password="$CI_ADMIN_PASS" --dry-run=client -o yaml | kubectl apply -f -
+  kubectl -n $CI_NAMESPACE create configmap cbci-oc-init-groovy --from-file=ci/groovy-init/ --dry-run=client -o yaml | kubectl apply -f -
+  kubectl -n $CI_NAMESPACE create configmap cbci-oc-quickstart-groovy --from-file=ci/groovy-quickstart/ --dry-run=client -o yaml | kubectl apply -f -
+  kubectl -n $CI_NAMESPACE create configmap cbci-op-casc-bundle --from-file=ci/ops-config-bundle/ --dry-run=client -o yaml | kubectl apply -f -
+  kubectl -n $CI_NAMESPACE apply -f ci/k8s/role.yaml
+
   helm upgrade --install cloudbees-ci cloudbees/cloudbees-core -n "$CI_NAMESPACE" \
     --create-namespace -f ci/values.yaml --version "$CI_VERSION" \
     --set OperationsCenter.HostName="$CI_DOMAIN" \
     $(if [ "$CD_ENABLED" = true ]; then echo "--set sda=true"; fi) \
-    --set-file 'OperationsCenter.ExtraGroovyConfiguration.02-rbac\.groovy'=./ci/02-rbac.groovy
+    --set-file 'OperationsCenter.ExtraGroovyConfiguration.z-quickstart-hook\.groovy'=./ci/groovy-license-activated/z-quickstart-hook.groovy
   . ./scripts/workload_identity.sh
 fi
+
 
 if [ "$CD_ENABLED" = true ]; then
   CD_DOMAIN="sda.$BASE_DOMAIN"
