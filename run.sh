@@ -69,7 +69,7 @@ if [ "$CI_ENABLED" = true ]; then
   kubectl apply -f https://raw.githubusercontent.com/GoogleCloudPlatform/secrets-store-csi-driver-provider-gcp/main/deploy/provider-gcp-plugin.yaml
 
   kubectl create ns $CI_NAMESPACE
-  kubectl create secret generic ci-pass --from-literal=password="$CI_ADMIN_PASS" --dry-run=client -o yaml | kubectl apply -f -
+  kubectl create secret generic ci-pass --from-literal=password="$CI_ADMIN_PASS" --dry-run=client -o yaml | kubectl apply -n $CI_NAMESPACE -f -
   kubectl -n $CI_NAMESPACE create configmap cbci-oc-init-groovy --from-file=ci/groovy-init/ --dry-run=client -o yaml | kubectl apply -f -
   kubectl -n $CI_NAMESPACE create configmap cbci-oc-quickstart-groovy --from-file=ci/groovy-quickstart/ --dry-run=client -o yaml | kubectl apply -f -
   kubectl -n $CI_NAMESPACE create configmap cbci-op-casc-bundle --from-file=ci/ops-config-bundle/ --dry-run=client -o yaml | kubectl apply -f -
