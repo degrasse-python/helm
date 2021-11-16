@@ -1,6 +1,7 @@
 tcp:
   8200: "cloudbees-sda/flow-repository:8200"
   8443: "cloudbees-sda/flow-server:8443"
+  7800: "cloudbees-sda/gateway-external-agent-flow-agents:7800"
   61613: "cloudbees-sda/flow-server:61613"
   9200: "cloudbees-sda/flow-devopsinsight:9200"
   9500: "cloudbees-sda/flow-devopsinsight:9500"

@@ -126,3 +126,11 @@ nginx-ingress:
 
 demoMode: false
 
+
+internalGatewayAgent:
+  enabled: true
+
+externalGatewayAgent:
+  enabled: true
+  service:
+    publicHostName:

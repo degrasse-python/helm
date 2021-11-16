@@ -105,6 +105,7 @@ if [ "$CD_ENABLED" = true ]; then
   helm upgrade --install cloudbees-cd cloudbees/cloudbees-flow -n "$CD_NAMESPACE" \
     --create-namespace -f cd/values.yaml --version "$CD_VERSION" \
     --set ingress.host="$CD_DOMAIN" $(if [ "$CD_IMAGE_TAG" ]; then echo "--set images.tag=$CD_IMAGE_TAG"; fi) \
+    --set externalGatewayAgent.service.publicHostName="$CD_DOMAIN" \
     --set flowCredentials.adminPassword=$CD_ADMIN_PASS \
     --set database.dbPassword=$MYSQL_PASSWORD \
     --set flowLicense.licenseData="$CD_LICENSE" \
