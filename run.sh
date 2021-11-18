@@ -109,7 +109,7 @@ if [ "$CD_ENABLED" = true ]; then
     --set flowCredentials.adminPassword=$CD_ADMIN_PASS \
     --set database.dbPassword=$MYSQL_PASSWORD \
     --set flowLicense.licenseData="$CD_LICENSE" \
-   #--set serverName="$CD_DOMAIN" \
+    --set serverName="$CD_DOMAIN" \
     --set repository.serviceEndpoint="$CD_DOMAIN" \
     --timeout 10000s
   # Install CD agent
