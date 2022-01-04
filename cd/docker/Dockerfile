@@ -2,16 +2,16 @@ FROM docker.io/cloudbees/cbflow-agent:10.3.5.152587_3.0.46_20211222
 
 USER root
 # install curl, git, vim, python3 via apt-get
-RUN apt -y update && \
-    apt -y install curl vim git python3 gnupg2 && \
+RUN apt-get -y update && \
+    apt-get -y install curl vim git python3 gnupg2 && \
     rm -rf /var/lib/apt/lists/*
 
 
 RUN curl https://baltocdn.com/helm/signing.asc | apt-key add - && \
-    apt install apt-transport-https --yes && \
+    apt-get install apt-transport-https --yes && \
     echo "deb https://baltocdn.com/helm/stable/debian/ all main" | tee /etc/apt/sources.list.d/helm-stable-debian.list && \
-    apt update && \
-    apt install helm -y && \
+    apt-get update && \
+    apt-get install helm -y && \
     rm -rf /var/lib/apt/lists/*
 
 
