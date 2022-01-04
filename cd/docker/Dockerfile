@@ -1,6 +1,6 @@
 FROM docker.io/cloudbees/cbflow-agent:10.3.2.151906_3.0.37_20211116
 
-USER root
+#USER root
 # install curl, git, vim, python3 via apt-get
 RUN apt-get -y update && \
     apt-get -y install curl vim git python3 gnupg2 && \
