@@ -12,7 +12,7 @@ helm repo add sandbox-charts https://cb-sandbox.github.io/charts/
 helm repo add jetstack https://charts.jetstack.io
 helm repo add jfrog https://charts.jfrog.io
 helm repo add oteemo-charts https://oteemo.github.io/charts
-helm repo add secrets-store-csi-driver https://raw.githubusercontent.com/kubernetes-sigs/secrets-store-csi-driver/master/charts
+helm repo add secrets-store-csi-driver https://kubernetes-sigs.github.io/secrets-store-csi-driver/charts
 
 
 # Update repos
