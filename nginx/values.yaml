@@ -2,13 +2,18 @@
 controller:
 # as we already use 8443 port for flow-server tcp expose , changed default admissionWebhooks port to 8445
   admissionWebhooks:
-    port: 8445
+    port: 8443
   config:
     proxy-stream-timeout: "4000s"
 
   ingressClassResource:
     name: nginx
     default: true
+  
+  publishService:
+    enabled: true 
+  scope:
+    enabled: true
     
 tcp:
   8200: "cloudbees-sda/flow-repository:8200"
