@@ -6,6 +6,10 @@ controller:
   config:
     proxy-stream-timeout: "4000s"
 
+  ingressClassResource:
+    name: nginx
+    default: true
+    
 tcp:
   8200: "cloudbees-sda/flow-repository:8200"
   8443: "cloudbees-sda/flow-server:8443"
