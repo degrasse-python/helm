@@ -19,12 +19,12 @@ helm repo update
 
 # Installing Nginx ingress controller
 if [ "$CD_ENABLED" = true ]; then
-  helm upgrade --install ingress-nginx stable/nginx-ingress \
-    -n ingress-nginx --create-namespace --version \
+  helm upgrade --install ingress-nginx ingress-nginx/ingress-nginx \
+    -n ingress-nginx --create-namespace \
     -f nginx/values.yaml
 else
-  helm upgrade --install ingress-nginx stable/nginx-ingress \
-    -n ingress-nginx --create-namespace --version 2.3.0
+  helm upgrade --install ingress-nginx ingress-nginx/ingress-nginx \
+    -n ingress-nginx --create-namespace --version 1.3.0
 fi
 
 # Setup DNS
